@@ -1,0 +1,22 @@
+{
+    "name": "alperdevv/vending-machine",
+    "description": "A vending machine modelled with a pure domain and hexagonal architecture.",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": "^8.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Vending\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Vending\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

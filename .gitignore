@@ -1,0 +1,8 @@
+# Dependencies
+/vendor/
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/
