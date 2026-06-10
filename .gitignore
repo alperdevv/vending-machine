@@ -1,6 +1,10 @@
 # Dependencies
 /vendor/
 
+# PHP tooling caches
+/.phpunit.cache/
+.phpunit.result.cache
+
 # OS / editor
 .DS_Store
 *.swp
