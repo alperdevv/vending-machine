@@ -15,3 +15,4 @@ record reads in a minute and stands on its own.
 | [0002](0002-money-as-integer-cents.md)               | Represent money as integer minor units        |
 | [0003](0003-testing-strategy-and-build-direction.md) | Testing strategy and build direction          |
 | [0004](0004-exception-taxonomy.md)                   | Exception taxonomy: invariants vs domain flow |
+| [0005](0005-change-making-by-backtracking.md)       | Make change by backtracking over finite stock |
