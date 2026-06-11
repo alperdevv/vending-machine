@@ -10,7 +10,9 @@ use InvalidArgumentException;
  * A purchasable item: the selector a customer presses and the price it costs.
  *
  * Items are data the machine is expected to grow, not a fixed set, so a product
- * is a value object identified by its selector rather than a hardcoded type.
+ * is a value object identified by its selector rather than a hardcoded type. The
+ * selector is a Selector, so its case- and whitespace-insensitivity lives there,
+ * in one place, not here.
  *
  * The price must be a positive multiple of the coin granularity — the gcd of the
  * accepted denominations. Every accepted coin is a multiple of that step, so any
@@ -23,16 +25,14 @@ use InvalidArgumentException;
 final readonly class Product
 {
     private function __construct(
-        private string $selector,
+        private Selector $selector,
         private Money $price,
     ) {
     }
 
     public static function of(string $selector, Money $price): self
     {
-        if (trim($selector) === '') {
-            throw new InvalidArgumentException('A product selector cannot be blank.');
-        }
+        $selector = Selector::fromInput($selector);
 
         if ($price->cents() <= 0) {
             throw new InvalidArgumentException("A product price must be positive; got {$price->cents()} cents.");
@@ -48,7 +48,7 @@ final readonly class Product
         return new self($selector, $price);
     }
 
-    public function selector(): string
+    public function selector(): Selector
     {
         return $this->selector;
     }
@@ -60,7 +60,7 @@ final readonly class Product
 
     public function equals(self $other): bool
     {
-        return $this->selector === $other->selector && $this->price->equals($other->price);
+        return $this->selector->equals($other->selector) && $this->price->equals($other->price);
     }
 
     private static function coinGranularity(): int

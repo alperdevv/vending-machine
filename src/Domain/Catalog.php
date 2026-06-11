@@ -34,18 +34,19 @@ final readonly class Catalog
 
         $bySelector = [];
         foreach ($products as $product) {
-            if (isset($bySelector[$product->selector()])) {
-                throw new InvalidArgumentException("Two products share the selector '{$product->selector()}'.");
+            $key = $product->selector()->value();
+            if (isset($bySelector[$key])) {
+                throw new InvalidArgumentException("Two products share the selector '{$key}'.");
             }
 
-            $bySelector[$product->selector()] = $product;
+            $bySelector[$key] = $product;
         }
 
         return new self($bySelector);
     }
 
-    public function find(string $selector): ?Product
+    public function find(Selector $selector): ?Product
     {
-        return $this->bySelector[$selector] ?? null;
+        return $this->bySelector[$selector->value()] ?? null;
     }
 }

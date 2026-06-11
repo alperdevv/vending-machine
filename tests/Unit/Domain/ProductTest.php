@@ -17,8 +17,16 @@ final class ProductTest extends TestCase
     {
         $water = Product::of('WATER', Money::fromCents(65));
 
-        self::assertSame('WATER', $water->selector());
+        self::assertSame('WATER', $water->selector()->value());
         self::assertTrue($water->price()->equals(Money::fromCents(65)));
+    }
+
+    #[Test]
+    public function it_canonicalises_its_selector(): void
+    {
+        $water = Product::of('  water ', Money::fromCents(65));
+
+        self::assertSame('WATER', $water->selector()->value());
     }
 
     #[Test]

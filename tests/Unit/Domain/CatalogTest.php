@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Vending\Domain\Catalog;
 use Vending\Domain\Money;
 use Vending\Domain\Product;
+use Vending\Domain\Selector;
 
 final class CatalogTest extends TestCase
 {
@@ -21,10 +22,18 @@ final class CatalogTest extends TestCase
             Product::of('SODA', Money::fromCents(150)),
         );
 
-        $found = $catalog->find('WATER');
+        $found = $catalog->find(Selector::fromInput('WATER'));
 
         self::assertNotNull($found);
         self::assertTrue($found->equals(Product::of('WATER', Money::fromCents(65))));
+    }
+
+    #[Test]
+    public function it_finds_a_product_however_the_selector_is_typed(): void
+    {
+        $catalog = Catalog::from(Product::of('WATER', Money::fromCents(65)));
+
+        self::assertNotNull($catalog->find(Selector::fromInput(' water ')));
     }
 
     #[Test]
@@ -32,7 +41,7 @@ final class CatalogTest extends TestCase
     {
         $catalog = Catalog::from(Product::of('WATER', Money::fromCents(65)));
 
-        self::assertNull($catalog->find('JUICE'));
+        self::assertNull($catalog->find(Selector::fromInput('JUICE')));
     }
 
     #[Test]
@@ -44,12 +53,12 @@ final class CatalogTest extends TestCase
     }
 
     #[Test]
-    public function it_rejects_two_products_sharing_a_selector(): void
+    public function it_rejects_two_products_with_the_same_canonical_selector(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
         Catalog::from(
-            Product::of('WATER', Money::fromCents(65)),
+            Product::of('water', Money::fromCents(65)),
             Product::of('WATER', Money::fromCents(100)),
         );
     }
