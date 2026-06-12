@@ -16,3 +16,4 @@ record reads in a minute and stands on its own.
 | [0003](0003-testing-strategy-and-build-direction.md) | Testing strategy and build direction          |
 | [0004](0004-exception-taxonomy.md)                   | Exception taxonomy: invariants vs domain flow |
 | [0005](0005-change-making-by-backtracking.md)       | Make change by backtracking over finite stock |
+| [0006](0006-atomic-sale-compute-then-commit.md)      | Atomic sale: compute-then-commit              |

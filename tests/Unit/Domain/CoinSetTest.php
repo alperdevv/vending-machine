@@ -97,6 +97,41 @@ final class CoinSetTest extends TestCase
     }
 
     #[Test]
+    public function merging_combines_the_tallies_per_denomination(): void
+    {
+        $a = CoinSet::fromCoins(Coin::TwentyFiveCents, Coin::TenCents);
+        $b = CoinSet::fromCoins(Coin::TenCents, Coin::FiveCents);
+
+        $merged = $a->merge($b);
+
+        self::assertSame(1, $merged->countOf(Coin::TwentyFiveCents));
+        self::assertSame(2, $merged->countOf(Coin::TenCents));
+        self::assertSame(1, $merged->countOf(Coin::FiveCents));
+        self::assertTrue($merged->total()->equals(Money::fromCents(50)));
+    }
+
+    #[Test]
+    public function merging_returns_a_new_set_and_leaves_both_operands_untouched(): void
+    {
+        $a = CoinSet::fromCoins(Coin::TenCents);
+        $b = CoinSet::fromCoins(Coin::TenCents);
+
+        $a->merge($b);
+
+        self::assertSame(1, $a->countOf(Coin::TenCents));
+        self::assertSame(1, $b->countOf(Coin::TenCents));
+    }
+
+    #[Test]
+    public function merging_with_the_empty_set_changes_nothing(): void
+    {
+        $set = CoinSet::fromCoins(Coin::TwentyFiveCents, Coin::FiveCents);
+
+        self::assertTrue($set->merge(CoinSet::empty())->equals($set));
+        self::assertTrue(CoinSet::empty()->merge($set)->equals($set));
+    }
+
+    #[Test]
     public function subtracting_a_denomination_down_to_zero_removes_it_entirely(): void
     {
         $set = CoinSet::fromCoins(Coin::TwentyFiveCents, Coin::TwentyFiveCents);

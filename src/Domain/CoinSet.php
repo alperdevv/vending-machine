@@ -57,6 +57,20 @@ final readonly class CoinSet
     }
 
     /**
+     * Returns this set plus every coin of $other — the session emptying into
+     * the drawer when a sale completes.
+     */
+    public function merge(self $other): self
+    {
+        $counts = $this->counts;
+        foreach ($other->counts as $cents => $count) {
+            $counts[$cents] = ($counts[$cents] ?? 0) + $count;
+        }
+
+        return new self($counts);
+    }
+
+    /**
      * Returns this set with the coins of $other taken out, one denomination at
      * a time.
      *
