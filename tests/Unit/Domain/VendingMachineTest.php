@@ -12,6 +12,8 @@ use Vending\Domain\Coin;
 use Vending\Domain\CoinSet;
 use Vending\Domain\Exception\CannotMakeChange;
 use Vending\Domain\Exception\InsufficientFunds;
+use Vending\Domain\Exception\MachineInService;
+use Vending\Domain\Exception\MachineNotInService;
 use Vending\Domain\Exception\ProductOutOfStock;
 use Vending\Domain\Exception\UnknownProduct;
 use Vending\Domain\Inventory;
@@ -286,6 +288,147 @@ final class VendingMachineTest extends TestCase
         $this->expectException(ProductOutOfStock::class);
 
         $machine->buy($this->selector('JUICE'));
+    }
+
+    #[Test]
+    public function servicing_replaces_the_drawer_rather_than_topping_it_up(): void
+    {
+        $machine = $this->machine(drawer: CoinSet::fromCoins(Coin::TwentyFiveCents));
+        $machine->beginService();
+
+        $machine->replaceDrawer(CoinSet::fromCoins(Coin::TenCents, Coin::TenCents));
+        $machine->endService();
+
+        self::assertTrue($machine->drawer()->equals(CoinSet::fromCoins(Coin::TenCents, Coin::TenCents)));
+    }
+
+    #[Test]
+    public function servicing_sets_stock_to_the_declared_count(): void
+    {
+        $machine = $this->machine(inventory: Inventory::empty()->withStock($this->selector('WATER'), 1));
+        $machine->beginService();
+
+        $machine->setStock($this->selector('WATER'), 5);
+        $machine->endService();
+
+        self::assertSame(5, $machine->stockOf($this->selector('WATER')));
+    }
+
+    #[Test]
+    public function setting_stock_for_a_selector_not_on_the_menu_is_refused(): void
+    {
+        $machine = $this->machine();
+        $machine->beginService();
+
+        $this->expectException(UnknownProduct::class);
+
+        $machine->setStock($this->selector('COFFEE'), 3);
+    }
+
+    #[Test]
+    public function inserting_is_refused_while_in_service(): void
+    {
+        $machine = $this->machine();
+        $machine->beginService();
+
+        $this->expectException(MachineInService::class);
+
+        $machine->insert(Coin::TenCents);
+    }
+
+    #[Test]
+    public function buying_is_refused_while_in_service(): void
+    {
+        $machine = $this->machine();
+        $machine->beginService();
+
+        $this->expectException(MachineInService::class);
+
+        $machine->buy($this->selector('WATER'));
+    }
+
+    #[Test]
+    public function returning_coins_is_refused_while_in_service(): void
+    {
+        $machine = $this->machine();
+        $machine->beginService();
+
+        $this->expectException(MachineInService::class);
+
+        $machine->returnCoins();
+    }
+
+    #[Test]
+    public function replacing_the_drawer_is_refused_while_selling(): void
+    {
+        $machine = $this->machine();
+
+        $this->expectException(MachineNotInService::class);
+
+        $machine->replaceDrawer(CoinSet::empty());
+    }
+
+    #[Test]
+    public function setting_stock_is_refused_while_selling(): void
+    {
+        $machine = $this->machine();
+
+        $this->expectException(MachineNotInService::class);
+
+        $machine->setStock($this->selector('WATER'), 5);
+    }
+
+    #[Test]
+    public function beginning_service_twice_is_refused(): void
+    {
+        $machine = $this->machine();
+        $machine->beginService();
+
+        $this->expectException(MachineInService::class);
+
+        $machine->beginService();
+    }
+
+    #[Test]
+    public function ending_service_without_being_in_service_is_refused(): void
+    {
+        $machine = $this->machine();
+
+        $this->expectException(MachineNotInService::class);
+
+        $machine->endService();
+    }
+
+    #[Test]
+    public function the_session_survives_a_service_cycle(): void
+    {
+        $machine = $this->machine();
+        $machine->insert(Coin::TenCents);
+        $machine->insert(Coin::TenCents);
+
+        $machine->beginService();
+        $machine->endService();
+
+        self::assertTrue($machine->balance()->equals(Money::fromCents(20)));
+        self::assertTrue($machine->returnCoins()->equals(CoinSet::fromCoins(Coin::TenCents, Coin::TenCents)));
+    }
+
+    #[Test]
+    public function the_machine_sells_from_what_service_left_in_it(): void
+    {
+        $machine = $this->machine();
+        $machine->beginService();
+        $machine->setStock($this->selector('WATER'), 1);
+        $machine->replaceDrawer(CoinSet::fromCoins(Coin::TenCents, Coin::TenCents, Coin::TenCents, Coin::FiveCents));
+        $machine->endService();
+
+        $machine->insert(Coin::TwentyFiveCents);
+        $machine->insert(Coin::TwentyFiveCents);
+        $machine->insert(Coin::TwentyFiveCents);
+        $vend = $machine->buy($this->selector('WATER'));
+
+        self::assertTrue($vend->change()->equals(CoinSet::fromCoins(Coin::TenCents)));
+        self::assertSame(0, $machine->stockOf($this->selector('WATER')));
     }
 
     private function machine(
