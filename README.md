@@ -16,6 +16,8 @@ the image.
 ```bash
 make build     # build the image (PHP 8.4 + pcov + Composer)
 make install   # install dependencies
+make stan      # static analysis (PHPStan, level max + strict rules)
+make cs        # coding style check (php-cs-fixer)
 make test      # run the whole test suite
 make run       # start the machine
 ```
