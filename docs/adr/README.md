@@ -19,3 +19,4 @@ record reads in a minute and stands on its own.
 | [0006](0006-atomic-sale-compute-then-commit.md)      | Atomic sale: compute-then-commit              |
 | [0007](0007-service-declares-state-set-not-add.md)   | Service declares state: SET, not ADD          |
 | [0008](0008-domain-events-deferred.md)               | Domain events: deferred (no second consumer)  |
+| [0009](0009-actor-cut-application-surface.md)        | Driving port: actor-cut action classes        |
