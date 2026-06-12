@@ -72,6 +72,7 @@ final class CoinSetTest extends TestCase
         $set = CoinSet::fromCoins(Coin::TenCents);
 
         $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Overdraw of 10c: removal of 2 exceeds the 1 on hand.');
 
         $set->subtract(CoinSet::fromCoins(Coin::TenCents, Coin::TenCents));
     }
