@@ -1,0 +1,37 @@
+# The same four gates run before every local commit, kept honest in CI:
+# tests, static analysis at max, coding style, and mutation testing with
+# the MSI threshold from infection.json.dist.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP 8.4 with pcov
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: pcov
+          tools: composer:v2
+
+      - name: Install dependencies (cached)
+        uses: ramsey/composer-install@v3
+
+      - name: Tests
+        run: vendor/bin/phpunit
+
+      - name: Static analysis
+        run: vendor/bin/phpstan analyse --no-progress
+
+      - name: Coding style
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff
+
+      - name: Mutation testing
+        run: vendor/bin/infection --threads=max --no-progress --logger-github
