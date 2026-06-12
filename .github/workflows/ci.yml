@@ -28,7 +28,7 @@ jobs:
         run: vendor/bin/phpunit
 
       - name: Static analysis
-        run: vendor/bin/phpstan analyse --no-progress
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=256M
 
       - name: Coding style
         run: vendor/bin/php-cs-fixer fix --dry-run --diff

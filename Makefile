@@ -25,7 +25,7 @@ test: ## Run the test suite
 	$(RUN) vendor/bin/phpunit
 
 stan: ## Run static analysis
-	$(RUN) vendor/bin/phpstan analyse
+	$(RUN) vendor/bin/phpstan analyse --memory-limit=256M
 
 cs: ## Check the coding style
 	$(RUN) vendor/bin/php-cs-fixer fix --dry-run --diff
