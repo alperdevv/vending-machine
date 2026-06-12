@@ -1,0 +1,10 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Vending\Infrastructure\Cli\Bootstrap;
+
+require dirname(__DIR__) . '/vendor/autoload.php';
+
+exit(Bootstrap::repl(STDIN, STDOUT, stream_isatty(STDIN))->run());

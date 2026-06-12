@@ -51,6 +51,17 @@ final class CustomerActionsTest extends TestCase
     }
 
     #[Test]
+    public function the_balance_reports_the_money_inserted_so_far(): void
+    {
+        $customer = $this->customer();
+
+        $customer->insertCoin(Coin::TwentyFiveCents);
+        $customer->insertCoin(Coin::TenCents);
+
+        self::assertTrue($customer->balance()->equals(Money::fromCents(35)));
+    }
+
+    #[Test]
     public function returning_coins_gives_back_the_exact_pieces(): void
     {
         $customer = $this->customer();

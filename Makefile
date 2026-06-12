@@ -6,7 +6,7 @@ RUN := $(DC) run --rm app
 
 .DEFAULT_GOAL := help
 
-.PHONY: help build install test stan cs cs-fix
+.PHONY: help build install test stan cs cs-fix run
 
 help: ## List the available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -17,6 +17,9 @@ build: ## Build the Docker image
 
 install: ## Install Composer dependencies
 	$(RUN) composer install
+
+run: ## Start the vending machine
+	$(RUN) php bin/vending
 
 test: ## Run the test suite
 	$(RUN) vendor/bin/phpunit

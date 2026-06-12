@@ -6,6 +6,7 @@ namespace Vending\Application;
 
 use Vending\Domain\Coin;
 use Vending\Domain\CoinSet;
+use Vending\Domain\Money;
 use Vending\Domain\Selector;
 use Vending\Domain\Vend;
 
@@ -51,5 +52,15 @@ final readonly class CustomerActions
         $this->machines->save($machine);
 
         return $coins;
+    }
+
+    /**
+     * The money inserted so far — one of the three pieces of state the brief
+     * requires the machine to track, surfaced for the driver's prompt. A pure
+     * query: nothing changes, so nothing is saved.
+     */
+    public function balance(): Money
+    {
+        return $this->machines->load()->balance();
     }
 }
